@@ -1,0 +1,132 @@
+#include <TimerOne.h>
+unsigned int counter1=0;
+unsigned int counter2=0;
+void docount1()  // counts from the speed sensor
+{
+  counter1++;
+ 
+}  
+  void docount2()  // counts from the speed sensor
+{
+  
+  counter2++;// increase +1 the counter value
+} 
+void timerIsr()
+{
+  Timer1.detachInterrupt();  //stop the timer
+  Serial.print("Motor 1 Speed: "); 
+  int rotation = (counter2 / 24);  // divide by number of holes in Disc
+  Serial.print(rotation,DEC);  
+  Serial.println(" Rotation per seconds");
+   Serial.print("Motor 2 Speed: "); 
+  int rotation1 = (counter1 / 24);  // divide by number of holes in Disc
+  Serial.print(rotation1,DEC);  
+  Serial.println(" Rotation per seconds");  
+
+  counter1=0;
+  counter2=0;  //  reset counter to zero
+  Timer1.attachInterrupt( timerIsr );  //enable the timer
+}
+void setup() {
+  // put your setup code here, to run once:
+  #define lmpwm 2
+  #define rmpwm 3
+  pinMode(lmpwm,OUTPUT); //left motor 
+  pinMode(rmpwm,OUTPUT); //right motor
+  //pinMode(lmpwm,OUTPUT); //left motor anticlockwise 
+  //pinMode(lmpwm,OUTPUT); //right motor anticlockwise
+Serial.begin(9600);
+
+ Timer1.initialize(1000000); // set timer for 1sec
+ attachInterrupt(0, docount2, RISING); 
+//INTERRUPT ZERO IS USED ON PIN 2
+//increase counter when speed sensor pin goes High
+  attachInterrupt(1, docount1, RISING); 
+// increase counter when speed sensor pin goes High
+//INTERRUPT 1 IS USED ON PIN 3
+  Timer1.attachInterrupt( timerIsr ); // enable the timer
+  pinMode(8,OUTPUT);
+  pinMode(9,OUTPUT);
+  pinMode(49,INPUT); //sensor5
+  pinMode(50,INPUT); //sensor4
+  pinMode(51,INPUT); //sensor3
+  pinMode(52,INPUT); //sensor2
+  pinMode(53,INPUT); //sensor1
+  pinMode(31,INPUT);
+}
+void loop() {
+  // put your main code here, to run repeatedly:
+ // int  i=0,j=0,flag=1;
+/*  if(digitalRead(31)==HIGH && flag==1){
+    i=i+1;
+    flag=0;
+    if(i=25){
+      j=j+1;
+      i=0;
+      }
+    }
+    else if(digitalRead(31)==LOW)
+      flag=1;
+    Serial.print(j);*/
+  digitalWrite(8,HIGH);
+  digitalWrite(9,HIGH);
+   
+    if(digitalRead(50)==LOW && digitalRead(51)==LOW && digitalRead(52)==LOW && digitalRead(49)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100);
+    analogWrite(rmpwm,100);
+  }
+      else if(digitalRead(49)==LOW && digitalRead(50)==LOW && digitalRead(51)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100);
+    analogWrite(rmpwm,0);
+  }
+    else if(digitalRead(49)==LOW  && digitalRead(50)==HIGH && digitalRead(51)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100); //dutycycle = (100/255)*100 = 39.21%
+    analogWrite(rmpwm,0); //dutycycle = (255/255)*100 = 100%
+  }
+    else if(digitalRead(49)==HIGH && digitalRead(50)==LOW && digitalRead(51)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,25); //max speed
+    analogWrite(rmpwm,70);
+  }
+    else if(digitalRead(51)==LOW && digitalRead(49)==HIGH && digitalRead(50)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100);
+    analogWrite(rmpwm,100);
+  }
+    else if(digitalRead(52)==LOW && digitalRead(50)==HIGH && digitalRead(51)==HIGH && digitalRead(49)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,70); //dutycycle = (255/255)*100 = 100%
+    analogWrite(rmpwm,25); //dutycycle = (50/255)*100 = 19.60%
+  }
+    else if(digitalRead(49)==HIGH  && digitalRead(50)==HIGH && digitalRead(51)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==LOW){
+    analogWrite(lmpwm,100); //dutycycle = (255/255)*100 = 100%
+    analogWrite(rmpwm,0); //dutycycle = (0/255)*100 = 0%
+  }
+    else if(digitalRead(50)==LOW && digitalRead(49)==LOW && digitalRead(51)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,70);
+    analogWrite(rmpwm,25);
+  }
+    else if(digitalRead(50)==LOW && digitalRead(51)==LOW && digitalRead(49)==HIGH && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100);
+    analogWrite(rmpwm,100);
+  }
+    else if(digitalRead(51)==LOW && digitalRead(52)==LOW && digitalRead(49)==HIGH && digitalRead(50)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100);
+    analogWrite(rmpwm,100);
+  }
+    else if(digitalRead(52)==LOW && digitalRead(53)==LOW  && digitalRead(49)==HIGH && digitalRead(50)==HIGH && digitalRead(51)==HIGH){
+    analogWrite(lmpwm,0);
+    analogWrite(rmpwm,100);
+  }
+    else if(digitalRead(49)==LOW && digitalRead(50)==LOW && digitalRead(51)==LOW && digitalRead(52)==HIGH && digitalRead(53)==HIGH){
+    analogWrite(lmpwm,100);
+    analogWrite(rmpwm,0);
+  }
+    else if(digitalRead(51)==LOW && digitalRead(52)==LOW && digitalRead(53)==LOW && digitalRead(49)==HIGH && digitalRead(50)==HIGH){
+    analogWrite(lmpwm,0);
+    analogWrite(rmpwm,100);
+  }
+  else{
+    analogWrite(lmpwm,0);
+    analogWrite(rmpwm,0);
+    //analogWrite(4,0);
+    //analogWrite(5,0);
+    }
+}
